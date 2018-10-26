@@ -1,7 +1,5 @@
 #include "librairies.h"
 #include "fonctions.h"
-//TO DO//ALLOC_LAB_DYN(){
-//}
 
 void INIT_LAB(LABYRINTHE * LAB, int nbltmp, int nbcoltmp){
 	LAB->nbl=nbltmp;
@@ -32,7 +30,7 @@ void AFFICHE_LAB(LABYRINTHE *LAB){
 	printf("────────────────────────────────────────\n");
 	for(i=0; i<LAB->nbl; i++){
 		for(j=0; j<LAB->nbcol; j++){
-			printf("▏%2d ", LAB->lab[i][j]);
+			printf("▏%2d (%d,%d) ", LAB->lab[i][j], i, j);
 		}
 		printf("▏\n");
 		printf("────────────────────────────────────────\n");
@@ -57,7 +55,7 @@ void LIB_LAB(LABYRINTHE *LAB){
 	free(LAB);
 	LAB=NULL;
 }
-void AFFICHE_LAB_DS_FIC(LABYRINTHE *LAB, FILE * FIC){
+void ECRIT_LAB_DS_FIC(LABYRINTHE *LAB, FILE * FIC){
 	fprintf(FIC, "%d %d %d %d %d %d\n", LAB->nbl, LAB->nbcol, LAB->pentreeX, LAB->pentreeY, LAB->psortieX, LAB->psortieY);
 	int i,j;
 	for(i=0; i<LAB->nbl; i++){
@@ -67,7 +65,16 @@ void AFFICHE_LAB_DS_FIC(LABYRINTHE *LAB, FILE * FIC){
 		fprintf(FIC, "\n");
 	}
 }
+void INIT_LAB_VIA_FIC(LABYRINTHE *LAB, FILE * FIC){
+	fscanf(FIC, "%d %d %d %d %d %d", &LAB->nbl, &LAB->nbcol, &LAB->pentreeX, &LAB->pentreeY, &LAB->psortieX, &LAB->psortieY);
 
+	int i,j;
+	for(i=0; i<LAB->nbl; i++){
+		for(j=0; j<LAB->nbcol; j++){
+			fscanf(FIC, "%d ", &LAB->lab[i][j]);
+		}
+	}
+}
 
 //Initialistation cellule 0-15
 /*
