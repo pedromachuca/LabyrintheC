@@ -21,114 +21,102 @@ void INIT_LAB(LABYRINTHE * LAB, int nbltmp, int nbcoltmp){
 	LAB->psortieY=9;
 	LAB->posXChercheur=LAB->pentreeX;
 	LAB->posYChercheur=LAB->pentreeY;
-}/*
-void INIT_ALEA_LAB(LABYRINTHE *LAB){
-	int i,j;
-	for(i=0; i<LAB->nbl; i++){
-		for(j=0; j<LAB->nbcol; j++){
-			if(i==0&&j==0){
-				int liste[]={11,13};
-				int r =rand()%2;
-				LAB->lab[i][j]=(unsigned short)liste[r];
-			}
-			else if(i==0){
-				if(((LAB->lab[i][j-1]>>3)&1)==1){
-					LAB->lab[i][j]=(unsigned short)(12+rand()%4);
-				}
-				else{
-					int liste1 []={8,10,12,14};
-					int r1=rand()%4;
-					LAB->lab[i][j]=(unsigned short)(liste1[r1]);
-				}
-			}
-			else if(i==0&&j==LAB->nbcol-1){
-				if(((LAB->lab[i][j-1]>>3)&1)==1){
-					int liste2 []={13, 15};
-					int r2 =rand()%2;
-					LAB->lab[i][j]=(unsigned short)liste2[r2];
-				}
-				else{
-					int liste3 []={12,14};
-					int r3=rand()%2;
-					LAB->lab[i][j]=(unsigned short)(liste[r3]);
-				}
-			}
-			else if(j==0){
-				if(((LAB->lab[i-1][j]>>1)&1)==1){
-					int liste4 []={11, 13, 15};
-					int r4=rand()%3;
-					LAB->lab[i][j]=(unsigned short)(liste[r4]);
-				}
-				else{
-					int liste5 []={1,3,5,7};
-					int r5=rand()%4;
-					LAB->lab[i][j]=(unsigned short)(liste[r5]);
-				}
-			}
-			else if(i==LAB->nbl-1){
-
-			}
-			}
-			else if(j==LAB->nbcol-1){
-				
-			}
-			else{
-				if(((LAB->lab[i-1][j]>>1)&1)==1){
-					int liste4 []={11, 13, 15};
-					int r4=rand()%3;
-					LAB->lab[i][j]=(unsigned short)(liste[r4]);
-				}
-				else{
-					int liste5 []={1,3,5,7};
-					int r5=rand()%4;
-					LAB->lab[i][j]=(unsigned short)(liste[r5]);
-				}
-				
-
-			}
-
-		}
+}
 //Initialistation cellule 0-15
-1111 : tous les murs ->15 
-1000 : mur haut -> 8
-0100 : mur droite->4
-0010 : mur bas ->2
-0001 : mur gauche ->1
-
-1001
-}*/
+//1111 : tous les murs ->15 
+//1000 : mur haut -> 8
+//0100 : mur droite->4
+//0010 : mur bas ->2
+//0001 : mur gauche ->1
 void INIT_ALEA_LAB(LABYRINTHE *LAB){
 	int i,j;
 
 	for(i=0; i<LAB->nbl; i++){
 		for(j=0; j<LAB->nbcol; j++){
+			//xor posible sur mur bas et mur droite
 			if(i==0&&j==0){
 				unsigned short liste[]={2,4};
 				int r =rand()%2;
 				LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^liste[r]);
 			}
-			else if(i==0){
+			//xor possible sur mur bas
+			//mur gauche a checker avec le mur droit précédent
+			else if(i==0&&j==(LAB->nbcol-1)){
+				int r1 =rand()%2;
 				unsigned short predroite = (LAB->lab[i][j-1]>>2)&1;
-				unsigned short cegauche = 8^predroite;
-				LAB->lab[i][j]=(unsigned short)(cegauche+rand()%7);
+				//si la case précédente n'a pas de mur à droite
+				//alors on enlève le mur gauche de la case courante 
+				if(predroite==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^1);
+				}
+				//on enlève le mur bas aléatoirement
+				if(r1==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^2);
+				}
+			}
+			//xor possible mur bas, mur droite
+			//checker mur gauche par rapport au précédent
+			else if(i==0){
+				unsigned short predroite1 = (LAB->lab[i][j-1]>>2)&1;
+				if(predroite1==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^1);
+				}
+				unsigned short liste1[]={2,4};
+				int r2 =rand()%2;
+				LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^liste1[r2]);
 
 			}
-			else if(i==0&&j==LAB->nbcol-1){
-				unsigned short predroite1 = (LAB->lab[i][j-1]>>2)&1;
-				unsigned short cegauche1 = 12^predroite1;
-				LAB->lab[i][j]=(unsigned short)(cegauche1+rand()%4);
-			}
-			else if(j==0){
+			//xor possible mur droit
+			//mur haut a checker avec le précédent
+			else if(i==(LAB->nbl-1)&&j==0){
 				unsigned short prebas = (LAB->lab[i-1][j]>>1)&1;
-				unsigned short cehaut = 1^(prebas<<3);
-				LAB->lab[i][j]=(unsigned short)(cehaut+rand()%7);
-				
+				if(prebas==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^8);
+				}
+				int r3=rand()%2;
+				if(r3==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^4);
+				}
 			}
-			else{
-				unsigned short liste1[]={4, 2};
+			//aucun xor possible
+			//checker mur gauche (mur droit précédent)
+			//cheker mur haut (mur bas précédent)
+			else if(i==(LAB->nbl-1)&&j==(LAB->nbcol-1)){
+				unsigned short predroit2 = (LAB->lab[i][j-1]>>2)&1;
 				unsigned short prebas1 = (LAB->lab[i-1][j]>>1)&1;
-				unsigned short predroite1 = (LAB->lab[i][j-1]>>2)&1;
-				LAB->lab[i][j]=LAB->lab[i][j]^prebas1^predroite1^liste1[(rand()%2)];
+				if(predroit2==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^1);
+				}
+				if(prebas1==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^8);
+				}
+			}
+			//xor possible mur droit, mur bas
+			//checker mur haut (mur bas précédent)
+			else if(j==0){
+				unsigned short prebas2 = (LAB->lab[i-1][j]>>1)&1;
+				if(prebas2==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^8);
+				}
+				unsigned short liste2[]={0,2,4};
+				int r4 =rand()%2;
+				LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^liste2[r4]);
+			}
+			//xor possible mur droit mur bas
+			//checker mur haut (mur bas précédent)
+			//checker mur gauche (mur droit précédent)
+			else{
+				unsigned short liste3[]={2,4};
+				unsigned short prebas3 = (LAB->lab[i-1][j]>>1)&1;
+				unsigned short predroite3 = (LAB->lab[i][j-1]>>2)&1;
+				if(prebas3==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^8);
+				}
+				if(predroite3==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^1);
+				}
+				int r5 =rand()%2;
+				LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^liste3[r5]);
 			}
 		}
 	}
@@ -156,8 +144,12 @@ void ECRIT_LAB_DS_FIC(LABYRINTHE *LAB, FILE * FIC){
 }
 void INIT_LAB_VIA_FIC(LABYRINTHE *LAB, FILE * FIC){
 	fscanf(FIC, "%d %d %d %d %d %d", &LAB->nbl, &LAB->nbcol, &LAB->pentreeX, &LAB->pentreeY, &LAB->psortieX, &LAB->psortieY);
-
 	int i,j;
+
+	LAB->lab=malloc((LAB->nbl)*sizeof(unsigned short *));
+	for(i=0; i<LAB->nbl; i++){
+		LAB->lab[i]=malloc((LAB->nbcol)*sizeof(unsigned short));
+	}
 	for(i=0; i<LAB->nbl; i++){
 		for(j=0; j<LAB->nbcol; j++){
 			fscanf(FIC, "%hu ", &LAB->lab[i][j]);
@@ -189,7 +181,7 @@ void AFFICHE_LAB(LABYRINTHE *LAB){
 			}
 			else{
 				unsigned short gauche=(LAB->lab[i][j]&1);
-				unsigned short droite=((LAB->lab[i][j]>>2)&1);
+				unsigned short droite=((LAB->lab[i][j-1]>>2)&1);
 				if(gauche==1||droite==1){
 					printf("| %2hu", LAB->lab[i][j]);
 				}
@@ -208,4 +200,25 @@ void AFFICHE_LAB(LABYRINTHE *LAB){
 	}
 	printf("+\n");
 }
+int menu(){
+	int choix=0;
+	printf("*************************************************\n");
+	printf("* Bienvenue dans ce labyrinthe!                 *\n");
+	printf("*                                               *\n");
+	printf("* Veuillez choisir une option ci dessous:       *\n");
+	printf("*                                               *\n");
+	printf("* 1- Generation aléatoire d'un labyrinthe       *\n");
+	printf("* 2- Chargement du labyrinthe depuis un fichier *\n");
+	printf("*                                               *\n");
+	printf("*************************************************\n");
+ 	
+	printf("Veuillez entrer votre choix : ");
+	scanf("%d", &choix);
 
+	return choix;
+}
+/*
+void verificationCoherenceFichier(){
+
+}
+ */
