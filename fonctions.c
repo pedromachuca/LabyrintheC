@@ -17,8 +17,8 @@ void INIT_LAB(LABYRINTHE * LAB, int nbltmp, int nbcoltmp){
 	}
 	LAB->pentreeX =0;
 	LAB->pentreeY=0;
-	LAB->psortieX=9;
-	LAB->psortieY=9;
+	LAB->psortieX=nbltmp-1;
+	LAB->psortieY=nbcoltmp-1;
 	LAB->posXChercheur=LAB->pentreeX;
 	LAB->posYChercheur=LAB->pentreeY;
 }
@@ -36,8 +36,8 @@ void INIT_ALEA_LAB(LABYRINTHE *LAB){
 			//xor posible sur mur bas et mur droite
 			if(i==0&&j==0){
 				unsigned short liste[]={2,4};
-				int r =rand()%2;
-				LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^liste[r]);
+				LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^liste[0]);
+				LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^liste[1]);
 			}
 			//xor possible sur mur bas
 			//mur gauche a checker avec le mur droit précédent
@@ -63,7 +63,13 @@ void INIT_ALEA_LAB(LABYRINTHE *LAB){
 				}
 				unsigned short liste1[]={2,4};
 				int r2 =rand()%2;
-				LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^liste1[r2]);
+				if(r2==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^liste1[r2]);
+				}
+				else{
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^4);
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^2);
+				}
 
 			}
 			//xor possible mur droit
@@ -84,12 +90,14 @@ void INIT_ALEA_LAB(LABYRINTHE *LAB){
 			else if(i==(LAB->nbl-1)&&j==(LAB->nbcol-1)){
 				unsigned short predroit2 = (LAB->lab[i][j-1]>>2)&1;
 				unsigned short prebas1 = (LAB->lab[i-1][j]>>1)&1;
-				if(predroit2==0){
-					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^1);
+				if(predroit2==1){
+					LAB->lab[i][j-1]=(unsigned short)(LAB->lab[i][j]^4);
 				}
-				if(prebas1==0){
-					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^8);
+				if(prebas1==1){
+					LAB->lab[i-1][j]=(unsigned short)(LAB->lab[i][j]^2);
 				}
+				LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^8);
+				LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^1);
 			}
 			//xor possible mur droit, mur bas
 			//checker mur haut (mur bas précédent)
@@ -98,7 +106,7 @@ void INIT_ALEA_LAB(LABYRINTHE *LAB){
 				if(prebas2==0){
 					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^8);
 				}
-				unsigned short liste2[]={0,2,4};
+				unsigned short liste2[]={2,4};
 				int r4 =rand()%2;
 				LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^liste2[r4]);
 			}
@@ -117,10 +125,22 @@ void INIT_ALEA_LAB(LABYRINTHE *LAB){
 				}
 				int r5 =rand()%2;
 				LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^liste3[r5]);
+				if(predroite3==1&&prebas3==1){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^2);
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^2);
+				}
 			}
 		}
 	}
-}
+}/*
+void INIT_ALEA_LAB(LABYRINTHE *LAB){
+	for(i=0; i<LAB->nbl; i++){
+		for(j=0; j<LAB->nbcol; j++){
+			
+		}
+	}
+
+}*/
 void LIB_LAB(LABYRINTHE *LAB){
 	int i;
 	for(i=0; i<LAB->nbl; i++){
@@ -145,7 +165,8 @@ void ECRIT_LAB_DS_FIC(LABYRINTHE *LAB, FILE * FIC){
 void INIT_LAB_VIA_FIC(LABYRINTHE *LAB, FILE * FIC){
 	fscanf(FIC, "%d %d %d %d %d %d", &LAB->nbl, &LAB->nbcol, &LAB->pentreeX, &LAB->pentreeY, &LAB->psortieX, &LAB->psortieY);
 	int i,j;
-
+	LAB->posXChercheur=LAB->pentreeX;
+	LAB->posYChercheur=LAB->pentreeY;
 	LAB->lab=malloc((LAB->nbl)*sizeof(unsigned short *));
 	for(i=0; i<LAB->nbl; i++){
 		LAB->lab[i]=malloc((LAB->nbcol)*sizeof(unsigned short));
@@ -227,12 +248,80 @@ void CHEMINQCQ(LABYRINTHE *LAB){
 	char *emot ="😀";
 	printf("\033[%d;%dH", (LAB->pentreeX+3), (LAB->pentreeY+2));
 	printf("\e[38;2;255;0;0m %s\e[0m",emot);
-	LAB->posXChercheur=LAB->pentreeX;
-	LAB->posYChercheur=LAB->pentreeY;
+	printf("\n");
+	int goX=3;
+	int goY=2;
+	int i,j;
+	system("sleep 1");
 	while(LAB->posXChercheur!=LAB->psortieX&&LAB->posYChercheur!=LAB->psortieY){
-		printf("\033[35;40H");
-		
+		for(i=0; i<LAB->nbl; i++){
+			for(j=0; j<LAB->nbcol; j++){
+				if(((LAB->lab[i][j]>>2)&1)==0){
+					goY+=4;
+					printf("\033[%d;%dH", (LAB->posXChercheur+goX), (LAB->posYChercheur+goY));
+					printf("\e[38;2;255;0;0m %s\e[0m\n",emot);
+					goY-=4;
+					printf("\033[%d;%dH", (LAB->posXChercheur+goX), (LAB->posYChercheur+goY));
+					printf("\e[38;2;255;0;0m *\e[0m\n");
+				}
+				
+			}
+
+system("sleep 1");
+		}	
+		LAB->posXChercheur++;
+		LAB->posYChercheur++;
+		/*
+		goX++;
+		goY+=3;
+		printf("\033[%d;%dH", (LAB->posXChercheur+goX), (LAB->posYChercheur+goY));
+		printf("\e[38;2;255;0;0m %s\e[0m",emot);
+		printf("\033[35;40H");*/
 	}
 
 }
 
+int RP(LABYRINTHE *LAB){
+	if((LAB->posXChercheur==LAB->psortieX)&&(LAB->posYChercheur==LAB->psortieY)){
+		return 1;
+	}
+	LAB->lab[LAB->posXChercheur][LAB->posYChercheur]=LAB->lab[LAB->posXChercheur][LAB->posYChercheur]^(1<<4);
+	if(LAB->posXChercheur<LAB->nbl-1){
+		if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>4)&1)==1){
+			LAB->posXChercheur=LAB->posXChercheur+1;
+			RP(LAB);
+			return 1;
+		}
+	}
+	else{
+		LAB->posXChercheur=LAB->pentreeX;
+		if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>4)&1)==1){
+			LAB->posYChercheur=LAB->posYChercheur+1;
+			RP(LAB);
+			return 1;
+		}
+	}
+	return 0;
+}/*
+		explorer(graphe G, sommet s)
+	      marquer le sommet s
+		        afficher(s)
+	      pour tout sommet t fils du sommet s
+		              si t n'est pas marqué alors
+					                     explorer(G, t);*/
+	/*
+	if(LAB->posXChercheur==LAB->psortieX&&LAB->posYChercheur==LAB->psortieY){
+		return 1;
+	}
+	if(LAB->posXChercheur!=LAB->psortieX||LAB->posYChercheur!=LAB->psortieY){
+		if(RP(LAB)){
+			LAB->posXChercheur = LAB->posXChercheur+1;
+			return 1;
+		}
+		if(RP(LAB)){
+			LAB->posYChercheur = LAB->posYChercheur+1;
+			return 1;
+		}
+	}*/
+
+//}
