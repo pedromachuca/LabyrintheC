@@ -200,7 +200,7 @@ void AFFICHE_LAB(LABYRINTHE *LAB){
 	}
 	printf("+\n");
 }
-int menu(){
+int MENU(){
 	int choix=0;
 	printf("*************************************************\n");
 	printf("* Bienvenue dans ce labyrinthe!                 *\n");
@@ -222,3 +222,17 @@ void verificationCoherenceFichier(){
 
 }
  */
+
+void CHEMINQCQ(LABYRINTHE *LAB){
+	char *emot ="😀";
+	printf("\033[%d;%dH", (LAB->pentreeX+3), (LAB->pentreeY+2));
+	printf("\e[38;2;255;0;0m %s\e[0m",emot);
+	LAB->posXChercheur=LAB->pentreeX;
+	LAB->posYChercheur=LAB->pentreeY;
+	while(LAB->posXChercheur!=LAB->psortieX&&LAB->posYChercheur!=LAB->psortieY){
+		printf("\033[35;40H");
+		
+	}
+
+}
+

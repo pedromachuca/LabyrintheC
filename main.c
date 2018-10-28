@@ -5,7 +5,7 @@ int main(int argc, char *argv[]){
 	srand(time(NULL));
 	LABYRINTHE *LAB =(LABYRINTHE *)malloc(sizeof(LABYRINTHE));
 	FILE *FIC =NULL;
-	int choix=menu();
+	int choix=MENU();
 	if(choix==1){
 		INIT_LAB(LAB, 4,4);
 		INIT_ALEA_LAB(LAB);
@@ -21,9 +21,11 @@ int main(int argc, char *argv[]){
 	printf("LABYRINTHE :\n");
 	AFFICHE_LAB(LAB);
 	LIB_LAB(LAB);
-	char c;
-	scanf("%c", &c);
-	while(c !='q'){
-	}
+	CHEMINQCQ(LAB);
+	system("setterm --cursor off");
+	//char c;
+	//scanf("%c", &c);
+	//while(c !='q'){
+	//}
 	fclose(FIC);
 }
