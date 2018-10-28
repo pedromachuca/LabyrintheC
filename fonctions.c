@@ -285,6 +285,9 @@ int RP(LABYRINTHE *LAB){
 	if((LAB->posXChercheur==LAB->psortieX)&&(LAB->posYChercheur==LAB->psortieY)){
 		return 1;
 	}
+	//ICI on va faire si pas de mur case du bas on la marqe comme chemin on increment le chercheurX
+	//Si il y a un mur on regarde la case de droite si pas de mur on la marque comme chemin on
+	//increment chercheurY de 1
 	LAB->lab[LAB->posXChercheur][LAB->posYChercheur]=LAB->lab[LAB->posXChercheur][LAB->posYChercheur]^(1<<4);
 	if(LAB->posXChercheur<LAB->nbl-1){
 		if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>4)&1)==1){
