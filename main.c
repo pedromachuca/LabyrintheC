@@ -18,10 +18,9 @@ int main(int argc, char *argv[]){
 	}
 	system("clear");
 	printf("\033[1;1H");
-	printf("LABYRINTHE :\n");
 	AFFICHE_LAB(LAB);
 	//CHEMINQCQ(LAB);
-	//system("setterm --cursor off");
+	system("setterm --cursor off");
 	int test=RP(LAB);
 	if(test==0){
 		printf("PAS DE CHEMIN");

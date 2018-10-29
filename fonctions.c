@@ -132,15 +132,7 @@ void INIT_ALEA_LAB(LABYRINTHE *LAB){
 			}
 		}
 	}
-}/*
-void INIT_ALEA_LAB(LABYRINTHE *LAB){
-	for(i=0; i<LAB->nbl; i++){
-		for(j=0; j<LAB->nbcol; j++){
-			
-		}
-	}
-
-}*/
+}
 void LIB_LAB(LABYRINTHE *LAB){
 	int i;
 	for(i=0; i<LAB->nbl; i++){
@@ -239,73 +231,246 @@ int MENU(){
 	return choix;
 }
 /*
-void verificationCoherenceFichier(){
+explorer(graphe G, sommet s)
+	marquer le sommet s
+		afficher(s)
+	pour tout sommet t fils du sommet s
+		si t n'est pas marqué alors
+			explorer(G, t);
+*/
+int RP(LABYRINTHE *LAB){
+	int test=0;
+	if((LAB->posXChercheur==LAB->psortieX)&&(LAB->posYChercheur==LAB->psortieY)){
+		return 1;
+	}
+	LAB->lab[LAB->posXChercheur][LAB->posYChercheur]=LAB->lab[LAB->posXChercheur][LAB->posYChercheur]^(1<<4);
 
+	positionCurseur(LAB->pentreeX, LAB->pentreeY);
+	system("sleep 1");
+
+	//mur en bas
+	if((((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>1)&1)==0)&&(((LAB->lab[LAB->posXChercheur+1][LAB->posYChercheur]>>4)&1)==0)){
+		LAB->posXChercheur+=1;
+		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
+		system("sleep 1");
+		test=RP(LAB);
+		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
+		system("sleep 1");
+		LAB->posXChercheur-=1;
+		if(test==1){
+			return 1;
+		}
+	}
+	else{
+		printf("\033[22;22H");
+	}
+	//mur a droite
+	if((((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>2)&1)==0)&&(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur+1]>>4)&1)==0)){
+		LAB->posYChercheur+=1;
+		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
+		system("sleep 1");
+		test=RP(LAB);
+		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
+		system("sleep 1");
+		LAB->posYChercheur-=1;
+		if(test==1){
+			return 1;
+		}
+	}
+	else{
+		printf("\033[24;24H");
+	}
+	//mur en haut
+	if((((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>3)&1)==0)&&(((LAB->lab[LAB->posXChercheur-1][LAB->posYChercheur]>>4)&1)==0)){
+		LAB->posXChercheur-=1;
+		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
+		system("sleep 1");
+		test=RP(LAB);
+		LAB->posXChercheur+=1;
+		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
+		system("sleep 1");
+		if(test==1){
+			return 1;
+		}
+	}
+	else{
+		printf("\033[24;24H");
+	}
+	//mur a gauche
+	if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]&1)==0)&&(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur-1]>>4)&1)==0)){
+		LAB->posYChercheur-=1;
+		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
+		system("sleep 1");
+		test=RP(LAB);
+		LAB->posYChercheur+=1;
+		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
+		system("sleep 1");
+		if(test==1){
+			return 1;
+		}
+	}
+	else{
+		printf("\033[30;30H");
+	}
+	return 0;
 }
- */
+void positionCurseur(int l, int col){
+	l=(l*2)+2;
+	col =(col*4)+2;
+	char *emot ="😀";
+
+	printf("\033[%d;%dH", l, col);
+	printf("\e[38;2;255;0;0m %s\e[0m\n",emot);
+	fflush(stdout);
+}
+/*
+void CHEMINQCQ(LABYRINTHE *LAB){
+	char *emot ="😀";
+	int goX=2;
+	int goY=2;
+	int godroite=0;
+	while((LAB->posXChercheur!=LAB->psortieX)||(LAB->posYChercheur!=LAB->psortieY)){
+		if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]&(1<<1))==0)&&(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>6)&1)==0)){
+			LAB->lab[LAB->posXChercheur][LAB->posYChercheur]=LAB->lab[LAB->posXChercheur][LAB->posYChercheur]^(1<<4);
+			system("sleep 1");
+			printf("\033[%d;%dH", (LAB->posXChercheur+goX), (LAB->posYChercheur+goY));
+			printf("\e[38;2;255;0;0m %s\e[0m\n",emot);
+		}
+		else if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]&(1<<2))==0)&&(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>6)&1)==0)){
+			godroite=0;
+			LAB->lab[LAB->posXChercheur][LAB->posYChercheur]=LAB->lab[LAB->posXChercheur][LAB->posYChercheur]^(1<<5);
+	if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>4)&1)==0){
+		system("sleep 1");
+		printf("\033[%d;%dH", (LAB->posXChercheur), (LAB->posYChercheur));
+		printf("\e[38;2;255;0;0m %s\e[0m\n",emot);
+		RP(LAB);
+		return 1;
+	}
+	printf("\033[40;40H");
+	printf("posX1 %d\n",LAB->posXChercheur);
+	printf("posY1 %d\n",LAB->posYChercheur);
+	return 0;
+}
 
 void CHEMINQCQ(LABYRINTHE *LAB){
 	char *emot ="😀";
-	printf("\033[%d;%dH", (LAB->pentreeX+3), (LAB->pentreeY+2));
-	printf("\e[38;2;255;0;0m %s\e[0m",emot);
-	printf("\n");
-	int goX=3;
+	int goX=2;
 	int goY=2;
-	int i,j;
-	system("sleep 1");
-	while(LAB->posXChercheur!=LAB->psortieX&&LAB->posYChercheur!=LAB->psortieY){
-		for(i=0; i<LAB->nbl; i++){
-			for(j=0; j<LAB->nbcol; j++){
-				if(((LAB->lab[i][j]>>2)&1)==0){
-					goY+=4;
-					printf("\033[%d;%dH", (LAB->posXChercheur+goX), (LAB->posYChercheur+goY));
-					printf("\e[38;2;255;0;0m %s\e[0m\n",emot);
-					goY-=4;
-					printf("\033[%d;%dH", (LAB->posXChercheur+goX), (LAB->posYChercheur+goY));
-					printf("\e[38;2;255;0;0m *\e[0m\n");
-				}
-				
-			}
-
-system("sleep 1");
-		}	
-		LAB->posXChercheur++;
-		LAB->posYChercheur++;
-		/*
-		goX++;
-		goY+=3;
-		printf("\033[%d;%dH", (LAB->posXChercheur+goX), (LAB->posYChercheur+goY));
-		printf("\e[38;2;255;0;0m %s\e[0m",emot);
-		printf("\033[35;40H");*/
+	int godroite=0;
+	while((LAB->posXChercheur!=LAB->psortieX)||(LAB->posYChercheur!=LAB->psortieY)){
+		if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]&(1<<1))==0)&&(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>6)&1)==0)){
+			LAB->lab[LAB->posXChercheur][LAB->posYChercheur]=LAB->lab[LAB->posXChercheur][LAB->posYChercheur]^(1<<4);
+			system("sleep 1");
+			printf("\033[%d;%dH", (LAB->posXChercheur+goX), (LAB->posYChercheur+goY));
+			printf("\e[38;2;255;0;0m %s\e[0m\n",emot);
+		}
+		else if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]&(1<<2))==0)&&(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>6)&1)==0)){
+			godroite=0;
+			LAB->lab[LAB->posXChercheur][LAB->posYChercheur]=LAB->lab[LAB->posXChercheur][LAB->posYChercheur]^(1<<5);
+	if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>4)&1)==0){
+		system("sleep 1");
+		printf("\033[%d;%dH", (LAB->posXChercheur), (LAB->posYChercheur));
+		printf("\e[38;2;255;0;0m %s\e[0m\n",emot);
+		RP(LAB);
+		return 1;
 	}
-
+	printf("\033[40;40H");
+	printf("posX1 %d\n",LAB->posXChercheur);
+	printf("posY1 %d\n",LAB->posYChercheur);
+	return 0;
+}
+void CHEMINQCQ(LABYRINTHE *LAB){
+	char *emot ="😀";
+	int goX=2;
+	int goY=2;
+	int godroite=0;
+	while((LAB->posXChercheur!=LAB->psortieX)||(LAB->posYChercheur!=LAB->psortieY)){
+		if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]&(1<<1))==0)&&(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>6)&1)==0)){
+			LAB->lab[LAB->posXChercheur][LAB->posYChercheur]=LAB->lab[LAB->posXChercheur][LAB->posYChercheur]^(1<<4);
+			system("sleep 1");
+			printf("\033[%d;%dH", (LAB->posXChercheur+goX), (LAB->posYChercheur+goY));
+			printf("\e[38;2;255;0;0m %s\e[0m\n",emot);
+		}
+		else if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]&(1<<2))==0)&&(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>6)&1)==0)){
+			godroite=0;
+			LAB->lab[LAB->posXChercheur][LAB->posYChercheur]=LAB->lab[LAB->posXChercheur][LAB->posYChercheur]^(1<<5);
+			system("sleep 1");
+			printf("\033[%d;%dH", (LAB->posXChercheur+goX), (LAB->posYChercheur+goY));
+			printf("\e[38;2;255;0;0m %s\e[0m\n",emot);
+		}
+		else{
+			LAB->lab[LAB->posXChercheur][LAB->posYChercheur]=LAB->lab[LAB->posXChercheur][LAB->posYChercheur]^(1<<6);
+			system("sleep 1");
+			printf("\033[%d;%dH", (LAB->posXChercheur+goX), (LAB->posYChercheur+goY));
+			printf("\e[38;2;255;0;0m %s\e[0m\n",emot);
+		}
+		if((((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>4)&1)==1)&&((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>6)&1)==0){
+			goX+=1;
+			LAB->posXChercheur=LAB->posXChercheur+1;
+		}
+		else if((((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>5)&1)==1)&&(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>6)&1)==0)){
+			goY+=3;
+			LAB->posYChercheur=LAB->posYChercheur+1;
+		}
+		else{
+			godroite=1;
+			goX-=1;
+			goY+=3;
+			LAB->posXChercheur=LAB->posXChercheur-1;
+			LAB->posYChercheur=LAB->posYChercheur+1;
+		}
+		printf("posX %d", LAB->posXChercheur);
+		printf("posY %d", LAB->posYChercheur);
+	}
 }
 
+
 int RP(LABYRINTHE *LAB){
+	char *emot ="😀";
+//	printf("\033[%d;%dH", (LAB->pentreeX+3), (LAB->pentreeY+2));
+//	printf("\e[38;2;255;0;0m %s\e[0m",emot);
+//	printf("\n");
+	int initX=2;
+	int initY=2;
 	if((LAB->posXChercheur==LAB->psortieX)&&(LAB->posYChercheur==LAB->psortieY)){
 		return 1;
 	}
 	//ICI on va faire si pas de mur case du bas on la marqe comme chemin on increment le chercheurX
 	//Si il y a un mur on regarde la case de droite si pas de mur on la marque comme chemin on
 	//increment chercheurY de 1
+	if((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]&(1<<1))==0){
 	LAB->lab[LAB->posXChercheur][LAB->posYChercheur]=LAB->lab[LAB->posXChercheur][LAB->posYChercheur]^(1<<4);
-	if(LAB->posXChercheur<LAB->nbl-1){
-		if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>4)&1)==1){
-			LAB->posXChercheur=LAB->posXChercheur+1;
-			RP(LAB);
-			return 1;
-		}
+		system("sleep 1");
+		printf("\033[%d;%dH", (LAB->posXChercheur+(*goX)), (LAB->posYChercheur+(*goY)));
+		printf("\e[38;2;255;0;0m %s\e[0m\n",emot);
+		printf("\033[27;27H");
+		printf("posX :%d",LAB->posXChercheur);
 	}
-	else{
-		LAB->posXChercheur=LAB->pentreeX;
-		if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>4)&1)==1){
-			LAB->posYChercheur=LAB->posYChercheur+1;
-			RP(LAB);
-			return 1;
-		}
+	else if((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]&(1<<2))==0){
+		LAB->lab[LAB->posXChercheur][LAB->posYChercheur]=LAB->lab[LAB->posXChercheur][LAB->posYChercheur]^(1<<5);
+		system("sleep 1");
+		printf("\033[%d;%dH", (LAB->posXChercheur+(*goX)), (LAB->posYChercheur+(*goY)));
+		printf("\e[38;2;255;0;0m %s\e[0m\n",emot);
+		printf("\033[29;29H");
+		printf("posY :%d",LAB->posYChercheur);
+	}
+	if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>4)&1)==1){
+		LAB->posXChercheur=LAB->posXChercheur+1;
+		printf("\033[30;30H");
+		printf("posX1 :%d",LAB->posXChercheur);
+		RP(LAB);
+		return 1;
+	}
+	else if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>5)&1)==1){
+		LAB->posYChercheur=LAB->posYChercheur+1;
+		printf("\033[33;33H");
+		printf("posY1 :%d",LAB->posYChercheur);
+		RP(LAB);
+		return 1;
 	}
 	return 0;
-}/*
+}*/
+/*
 		explorer(graphe G, sommet s)
 	      marquer le sommet s
 		        afficher(s)
@@ -313,18 +478,10 @@ int RP(LABYRINTHE *LAB){
 		              si t n'est pas marqué alors
 					                     explorer(G, t);*/
 	/*
-	if(LAB->posXChercheur==LAB->psortieX&&LAB->posYChercheur==LAB->psortieY){
-		return 1;
-	}
-	if(LAB->posXChercheur!=LAB->psortieX||LAB->posYChercheur!=LAB->psortieY){
-		if(RP(LAB)){
-			LAB->posXChercheur = LAB->posXChercheur+1;
-			return 1;
-		}
-		if(RP(LAB)){
-			LAB->posYChercheur = LAB->posYChercheur+1;
-			return 1;
-		}
-	}*/
+/Initialistation cellule 0-15
+//1111 : tous les murs ->15 
+//1000 : mur haut -> 8
+//0100 : mur droite->4
+//0010 : mur bas ->2
+//0001 : mur gauche ->1*/
 
-//}

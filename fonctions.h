@@ -23,3 +23,4 @@ void INIT_LAB_VIA_FIC(LABYRINTHE *LAB, FILE * FIC);
 int MENU();
 void CHEMINQCQ(LABYRINTHE *LAB);
 int RP(LABYRINTHE *LAB);
+void positionCurseur(int ligne, int col);
