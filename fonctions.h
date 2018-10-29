@@ -24,3 +24,4 @@ int MENU();
 void CHEMINQCQ(LABYRINTHE *LAB);
 int RP(LABYRINTHE *LAB);
 void positionCurseur(int ligne, int col);
+void positionEtoile(int ligne, int col);

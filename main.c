@@ -20,7 +20,7 @@ int main(int argc, char *argv[]){
 	printf("\033[1;1H");
 	AFFICHE_LAB(LAB);
 	//CHEMINQCQ(LAB);
-	system("setterm --cursor off");
+	//system("setterm --cursor off");
 	int test=RP(LAB);
 	if(test==0){
 		printf("PAS DE CHEMIN");

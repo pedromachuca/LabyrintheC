@@ -28,6 +28,7 @@ void INIT_LAB(LABYRINTHE * LAB, int nbltmp, int nbcoltmp){
 //0100 : mur droite->4
 //0010 : mur bas ->2
 //0001 : mur gauche ->1
+
 void INIT_ALEA_LAB(LABYRINTHE *LAB){
 	int i,j;
 
@@ -53,6 +54,21 @@ void INIT_ALEA_LAB(LABYRINTHE *LAB){
 				if(r1==0){
 					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^2);
 				}
+			}
+			else if(j==LAB->nbcol-1){
+				unsigned short prebas=((LAB->lab[i-1][j]>>1)&1);
+				unsigned short predroite=((LAB->lab[i][j-1]>>2)&1);
+				if(prebas==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^8);
+				}
+				if(predroite==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^1);
+				}
+				int r1 =rand()%2;
+				if(r1==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^2);
+				}
+
 			}
 			//xor possible mur bas, mur droite
 			//checker mur gauche par rapport au précédent
@@ -99,6 +115,20 @@ void INIT_ALEA_LAB(LABYRINTHE *LAB){
 				LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^8);
 				LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^1);
 			}
+			else if(i==(LAB->nbl-1)){
+				unsigned short predroite = (LAB->lab[i][j-1]>>2)&1;
+				unsigned short prebas = (LAB->lab[i-1][j]>>1)&1;
+				if(predroite==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^1);
+				}
+				if(prebas==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^8);
+				}
+				int r3=rand()%2;
+				if(r3==0){
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^4);
+				}
+			}
 			//xor possible mur droit, mur bas
 			//checker mur haut (mur bas précédent)
 			else if(j==0){
@@ -125,9 +155,9 @@ void INIT_ALEA_LAB(LABYRINTHE *LAB){
 				}
 				int r5 =rand()%2;
 				LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^liste3[r5]);
-				if(predroite3==1&&prebas3==1){
+				if(predroite3==1||prebas3==1){
 					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^2);
-					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^2);
+					LAB->lab[i][j]=(unsigned short)(LAB->lab[i][j]^4);
 				}
 			}
 		}
@@ -239,88 +269,80 @@ explorer(graphe G, sommet s)
 			explorer(G, t);
 */
 int RP(LABYRINTHE *LAB){
-	int test=0;
+
+	int ret=0;
 	if((LAB->posXChercheur==LAB->psortieX)&&(LAB->posYChercheur==LAB->psortieY)){
 		return 1;
 	}
 	LAB->lab[LAB->posXChercheur][LAB->posYChercheur]=LAB->lab[LAB->posXChercheur][LAB->posYChercheur]^(1<<4);
+		positionEtoile(LAB->posXChercheur, LAB->posYChercheur);
 
 	positionCurseur(LAB->pentreeX, LAB->pentreeY);
 	system("sleep 1");
 
 	//mur en bas
 	if((((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>1)&1)==0)&&(((LAB->lab[LAB->posXChercheur+1][LAB->posYChercheur]>>4)&1)==0)){
+		positionEtoile(LAB->posXChercheur, LAB->posYChercheur);
 		LAB->posXChercheur+=1;
 		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
 		system("sleep 1");
-		test=RP(LAB);
-		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
-		system("sleep 1");
+		ret=RP(LAB);
 		LAB->posXChercheur-=1;
-		if(test==1){
+		if(ret==1){
 			return 1;
 		}
-	}
-	else{
-		printf("\033[22;22H");
 	}
 	//mur a droite
 	if((((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>2)&1)==0)&&(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur+1]>>4)&1)==0)){
+		positionEtoile(LAB->posXChercheur, LAB->posYChercheur);
 		LAB->posYChercheur+=1;
 		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
 		system("sleep 1");
-		test=RP(LAB);
-		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
-		system("sleep 1");
+		ret=RP(LAB);
 		LAB->posYChercheur-=1;
-		if(test==1){
+		if(ret==1){
 			return 1;
 		}
-	}
-	else{
-		printf("\033[24;24H");
 	}
 	//mur en haut
 	if((((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>3)&1)==0)&&(((LAB->lab[LAB->posXChercheur-1][LAB->posYChercheur]>>4)&1)==0)){
+		positionEtoile(LAB->posXChercheur, LAB->posYChercheur);
 		LAB->posXChercheur-=1;
 		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
 		system("sleep 1");
-		test=RP(LAB);
+		ret=RP(LAB);
 		LAB->posXChercheur+=1;
-		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
-		system("sleep 1");
-		if(test==1){
+		if(ret==1){
 			return 1;
 		}
-	}
-	else{
-		printf("\033[24;24H");
 	}
 	//mur a gauche
 	if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]&1)==0)&&(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur-1]>>4)&1)==0)){
 		LAB->posYChercheur-=1;
 		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
 		system("sleep 1");
-		test=RP(LAB);
+		ret=RP(LAB);
 		LAB->posYChercheur+=1;
-		positionCurseur(LAB->posXChercheur, LAB->posYChercheur);
-		system("sleep 1");
-		if(test==1){
+		if(ret==1){
 			return 1;
 		}
-	}
-	else{
-		printf("\033[30;30H");
 	}
 	return 0;
 }
 void positionCurseur(int l, int col){
-	l=(l*2)+2;
+	l = (l*2)+2;
 	col =(col*4)+2;
 	char *emot ="😀";
 
 	printf("\033[%d;%dH", l, col);
 	printf("\e[38;2;255;0;0m %s\e[0m\n",emot);
+	fflush(stdout);
+}
+void positionEtoile(int l, int col){
+	l = (l*2)+2;
+	col =(col*4)+2;
+	printf("\033[%d;%dH", l, col);
+	printf("\e[38;2;255;0;0m *\e[0m");
 	fflush(stdout);
 }
 /*
