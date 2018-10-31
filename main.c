@@ -19,13 +19,17 @@ int main(int argc, char *argv[]){
 	system("clear");
 	printf("\033[1;1H");
 	AFFICHE_LAB(LAB);
-	//CHEMINQCQ(LAB);
-	//system("setterm --cursor off");
+	AFFICHE_ENTREE(LAB);
+	AFFICHE_SORTIE(LAB);
+	system("sleep 1");
+	system("setterm --cursor off");
 	int test=RP(LAB);
 	if(test==0){
-		printf("PAS DE CHEMIN");
+   		printf("\033[%d;%dH", ((LAB->nbl*2)+4), 0);
+		printf("PAS DE CHEMIN\n");
 	}
 	else{
+   		printf("\033[%d;%dH", ((LAB->nbl*2)+4), 0);
 		printf("CHEMIN trouve\n");
 	}
 	LIB_LAB(LAB);
