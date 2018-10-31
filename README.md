@@ -3,7 +3,7 @@
 This program is an *maze generator/solver*.
 A makefile is include. To start the program enter the following command:
 
-```make -s``` (option -s not to see the output of the makefile)
+```**make -s**``` (option -s not to see the output of the makefile)
 ##
 The program will start by asking you whether you like to generate
 a maze or if you prefer to charge it from a file.
