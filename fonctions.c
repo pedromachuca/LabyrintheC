@@ -1,9 +1,20 @@
 #include "librairies.h"
 #include "fonctions.h"
 
-void INIT_LAB(LABYRINTHE * LAB, int nbltmp, int nbcoltmp){
+void INIT_LAB(LABYRINTHE * LAB){
+	int nbltmp=0;
+	int nbcoltmp=0;
+	
+	//scanf non sécurisé, doit vérifier que le
+	//retour est bien un int
+	printf("Entrer le nombre de lignes : ");
+	scanf(" %d", &nbltmp);
 	LAB->nbl=nbltmp;
+
+	printf("Entrer le nombre de colonnes: ");
+	scanf(" %d", &nbcoltmp);
 	LAB->nbcol=nbcoltmp;
+
 	//Allocation tab 2D:
 	int i, j;
 	LAB->lab=malloc((LAB->nbl)*sizeof(unsigned short *));
@@ -15,6 +26,7 @@ void INIT_LAB(LABYRINTHE * LAB, int nbltmp, int nbcoltmp){
 			LAB->lab[i][j]=15;
 		}
 	}
+	//On met l'entree et sortie a chaque bout du labytinthe (temporaire)
 	LAB->pentreeX =0;
 	LAB->pentreeY=0;
 	LAB->psortieX=nbltmp-1;
@@ -29,6 +41,8 @@ void INIT_LAB(LABYRINTHE * LAB, int nbltmp, int nbcoltmp){
 //0010 : mur bas ->2
 //0001 : mur gauche ->1
 /*
+//Première méthode de génération aléatoire
+//Trop longue remplacé par la fonction d'après
 void INIT_ALEA_LAB(LABYRINTHE *LAB){
 	int i,j;
 
@@ -166,6 +180,16 @@ void INIT_ALEA_LAB(LABYRINTHE *LAB){
 */
 void INIT_ALEA_LAB(LABYRINTHE *LAB){
 	int i,j;
+	
+	do{
+		LAB->pentreeX=(rand()%(LAB->nbl-1));
+		LAB->pentreeY=(rand()%(LAB->nbcol-1));
+		LAB->psortieX=(rand()%(LAB->nbl-1));
+		LAB->psortieY=(rand()%(LAB->nbcol-1));
+	}while((LAB->pentreeX==LAB->psortieX)&&(LAB->pentreeY==LAB->psortieY));
+
+	LAB->posXChercheur=LAB->pentreeX;
+	LAB->posYChercheur=LAB->pentreeY;
 
 	for(i=0; i<LAB->nbl; i++) {
 		for(j=0; j<LAB->nbcol-1; j++) {
@@ -290,77 +314,116 @@ explorer(graphe G, sommet s)
 		si t n'est pas marqué alors
 			explorer(G, t);
 */
-int RP(LABYRINTHE *LAB){
+int RP(LABYRINTHE *LAB, int affichage){
 
 	int ret=0;
 	if((LAB->posXChercheur==LAB->psortieX)&&(LAB->posYChercheur==LAB->psortieY)){
 		return 1;
 	}
 	LAB->lab[LAB->posXChercheur][LAB->posYChercheur]=LAB->lab[LAB->posXChercheur][LAB->posYChercheur]^(1<<4);
-	POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
-	usleep(100000);
+	if(affichage==1){
+		POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		usleep(100000);
+	}
 
 	//mur en bas
 	if((((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>1)&1)==0)&&(((LAB->lab[LAB->posXChercheur+1][LAB->posYChercheur]>>4)&1)==0)){
-		POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		if(affichage==1){
+			POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		}
 		LAB->posXChercheur+=1;
-		POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
-		usleep(100000);
-		ret=RP(LAB);
+		if(affichage==1){
+			POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
+			usleep(100000);
+		}
+		ret=RP(LAB, affichage);
 		LAB->posXChercheur-=1;
 		if(ret==1){
 			return 1;
 		}
-		POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
-		usleep(100000);
-		POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		if(affichage==1){
+			POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
+			usleep(100000);
+			POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		}
 	}
 	//mur a droite
 	if((((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>2)&1)==0)&&(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur+1]>>4)&1)==0)){
-		POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		if(affichage==1){
+			POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		}
 		LAB->posYChercheur+=1;
-		POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
-		usleep(100000);
-		ret=RP(LAB);
+		if(affichage==1){
+			POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
+			usleep(100000);
+		}
+		ret=RP(LAB, affichage);
 		LAB->posYChercheur-=1;
 		if(ret==1){
 			return 1;
 		}
-		POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
-		usleep(100000);
-		POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		if(affichage==1){
+			POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
+			usleep(100000);
+			POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		}
 	}
 	//mur en haut
 	if((((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]>>3)&1)==0)&&(((LAB->lab[LAB->posXChercheur-1][LAB->posYChercheur]>>4)&1)==0)){
-		POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		if(affichage==1){
+			POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		}
 		LAB->posXChercheur-=1;
-		POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
-		usleep(100000);
-		ret=RP(LAB);
+		if(affichage==1){
+			POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
+			usleep(100000);
+		}
+		ret=RP(LAB, affichage);
 		LAB->posXChercheur+=1;
 		if(ret==1){
 			return 1;
 		}
-		POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
-		usleep(100000);
-		POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		if(affichage==1){
+			POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
+			usleep(100000);
+			POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		}
 	}
 	//mur a gauche
 	if(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur]&1)==0)&&(((LAB->lab[LAB->posXChercheur][LAB->posYChercheur-1]>>4)&1)==0)){
-		POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		if(affichage==1){
+			POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		}
 		LAB->posYChercheur-=1;
-		POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
-		usleep(100000);
-		ret=RP(LAB);
+		if(affichage==1){
+			POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
+			usleep(100000);
+		}
+		ret=RP(LAB, affichage);
 		LAB->posYChercheur+=1;
 		if(ret==1){
 			return 1;
 		}
-		POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
-		usleep(100000);
-		POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		if(affichage==1){
+			POS_CURSEUR(LAB->posXChercheur, LAB->posYChercheur);
+			usleep(100000);
+			POS_ETOILE(LAB->posXChercheur, LAB->posYChercheur);
+		}
 	}
 	return 0;
+}
+void REINIT(LABYRINTHE *LAB){
+	int i,j;
+
+	for(i=0; i<LAB->nbl; i++) {
+		for(j=0; j<LAB->nbcol; j++) {
+
+			LAB->lab[i][j]=(LAB->lab[i][j]&(0b01111));
+		}
+	}
+	LAB->posXChercheur=LAB->pentreeX;
+	LAB->posYChercheur=LAB->pentreeY;
+	
 }
 void POS_CURSEUR(int l, int col){
 	l = (l*2)+2;
@@ -391,4 +454,31 @@ void AFFICHE_SORTIE(LABYRINTHE *LAB){
 	printf("\033[%d;%dH", l, col);
 	printf("\e[38;2;0;255;0m SO\e[0m");
 	fflush(stdout);
+}
+int VERIF_COHERENCE(LABYRINTHE *LAB){
+	int i,j;
+	int nonCoherence=0;
+	for(i=0; i<LAB->nbl; i++){
+		for(j=0; j<LAB->nbcol; j++){
+			if(i==0&&(((LAB->lab[i][j]>>3)&1)!=1)){
+				nonCoherence++;	
+			}
+			if(j==0&&(((LAB->lab[i][j])&1)!=1)){
+				nonCoherence++;	
+			}
+			if(i==(LAB->nbl-1)&&(((LAB->lab[i][j]>>1)&1)!=1)){
+				nonCoherence++;	
+			}
+			if(j==(LAB->nbcol-1)&&(((LAB->lab[i][j]>>2)&1)!=1)){
+				nonCoherence++;	
+			}
+			if(i<(LAB->nbl-1)&&((LAB->lab[i][j]>>1)&1)!=((LAB->lab[i+1][j]>>3)&1)){
+				nonCoherence++;	
+			}
+			if(j<(LAB->nbcol-1)&&((LAB->lab[i][j]>>2)&1)!=((LAB->lab[i][j+1])&1)){
+				nonCoherence++;	
+			}
+		}
+	}
+	return nonCoherence;
 }
