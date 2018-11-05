@@ -1,7 +1,7 @@
 ## THE MAZE: Programming langage C
 
 This program is an **maze generator/solver**.
-A makefile is include. To start the program enter the following command:
+A makefile is included. To start the program enter the following command:
 
 ```make -s``` (option -s not to see the output of the makefile)
 ##
